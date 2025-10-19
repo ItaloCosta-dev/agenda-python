@@ -134,8 +134,7 @@ def listar_contatos():
         print("Nenhum contato cadastrado.")
         pausar()
         menu_principal()
-        return  # <-- importante: retorna pra não continuar executando abaixo
-
+        return  
     print("=================================")
     print("          LISTAR CONTATOS        ")
     print("=================================\n")
@@ -166,6 +165,64 @@ def listar_contatos():
         else:
             print("Opção inválida. Digite um número válido.")
 
+# -----------------------------
+# Função: deletar contato
+# -----------------------------
+def deletar_contato():
+    limpar_tela()
+    contatos = carregar_contatos()
+
+    if not contatos:
+        print("Nenhum contato cadastrado.")
+        pausar()
+        menu_principal()
+        return
+    
+    print("=================================")
+    print("         DELETAR CONTATO         ")
+    print("=================================\n")
+
+    for i, contato in enumerate(contatos, start=1):
+        print(f"[{i}] {contato['nome']}")
+    
+    print("\nDigite o número do contato que deseja deletar ou 0 para voltar")
+
+    while True:
+        escolha = input("\nEscolha ").strip()
+
+        if escolha == "0":
+            menu_principal()
+            return
+        
+        if escolha.isdigit() and 1 <= int(escolha) <= len(contatos):
+            indice = int(escolha) - 1
+            contato = contatos[indice]
+
+            limpar_tela()
+            print(f"=== DETALHES DO CONTATO [{escolha}] ===")
+            print(f"Nome: {contato['nome']}")
+            print(f"Nascimento: {contato['nascimento']}")
+            print(f"Telefone: {contato['telefone']}")
+            print(f"E-mail: {contato['email']}")
+            print("\n[0] Voltar")
+            print("[1] Deletar este contato")
+
+            while True:
+                confirmacao = input("\nEscolha: ").strip()
+                if confirmacao == "0":
+                    deletar_contato()
+                    return
+                elif confirmacao == "1":
+                    nome_excluido = contato['nome']
+                    del contatos[indice]
+                    salvar_contatos(contatos)
+                    print(f"\n Contato '{nome_excluido}' deletado com sucesso")
+                    pausar()
+                    menu_principal()
+                    return
+                else: print("Opção inválida. Digite [0] ou [1].")
+            else:
+                print("Opção inválida. Digite um número válido.")
 # -----------------------------
 # Funções principais
 # -----------------------------
@@ -219,11 +276,11 @@ def menu_principal():
             inserir_contato()
             break
         elif opcao == "2":
-            listar_contatos()  # ✅ Corrigido: agora chama a função corretamente
+            listar_contatos()  
             break
         elif opcao == "3":
-            print("\nDeletando contatos...\n")
-            time.sleep(1)
+            deletar_contato()
+            break
         elif opcao == "4":
             print("\nEditando contatos...\n")
             time.sleep(1)

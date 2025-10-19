@@ -8,3 +8,8 @@ Agenda de contatos em python, funcionando 100% no terminal.
 - Deletar contatos
 - Salvar contatos no sistema
 
+## Sistema
+![tela inicial](agenda.png)
+
+![menu](menu-agenda.png)
+

@@ -223,6 +223,98 @@ def deletar_contato():
                 else: print("Opção inválida. Digite [0] ou [1].")
             else:
                 print("Opção inválida. Digite um número válido.")
+
+# -----------------------------
+# Função: editar contato
+# -----------------------------
+def editar_contato():
+    limpar_tela()
+    contatos = carregar_contatos()
+
+    if not contatos:
+        print("Nenhum contato cadastrado.")
+        pausar()
+        menu_principal()
+        return
+
+    print("=================================")
+    print("          EDITAR CONTATO         ")
+    print("=================================\n")
+
+    for i, contato in enumerate(contatos, start=1):
+        print(f"[{i}] {contato['nome']}")
+    
+    print("\nDigite o número do contato que deseja editar ou 0 para voltar.")
+
+    while True:
+        escolha = input("\nEscolha: ").strip()
+
+        if escolha == "0":
+            menu_principal()
+            return
+
+        if escolha.isdigit() and 1 <= int(escolha) <= len(contatos):
+            indice = int(escolha) - 1
+            contato = contatos[indice]
+
+            while True:
+                limpar_tela()
+                print(f"=== EDITANDO CONTATO [{escolha}] ===")
+                print(f"[1] Nome: {contato['nome']}")
+                print(f"[2] Nascimento: {contato['nascimento']}")
+                print(f"[3] Telefone: {contato['telefone']}")
+                print(f"[4] E-mail: {contato['email']}")
+                print("\n[0] Voltar (salvar alterações)")
+
+                opcao = input("\nEscolha o campo que deseja editar: ").strip()
+
+                if opcao == "0":
+                    salvar_contatos(contatos)
+                    print("\n✅ Alterações salvas com sucesso!")
+                    pausar()
+                    menu_principal()
+                    return
+
+                elif opcao == "1":
+                    novo_nome = input("Novo nome: ").strip().title()
+                    if validar_nome(novo_nome):
+                        contato["nome"] = novo_nome
+                        print("✅ Nome atualizado com sucesso!")
+                    else:
+                        print("❌ Nome inválido. Digite apenas letras.")
+
+                elif opcao == "2":
+                    novo_nascimento = formatar_data_nascimento()
+                    contato["nascimento"] = novo_nascimento
+                    print("✅ Data de nascimento atualizada!")
+
+                elif opcao == "3":
+                    while True:
+                        novo_telefone = input("Novo telefone (DDD + número, apenas dígitos): ").strip()
+                        if validar_telefone(novo_telefone):
+                            contato["telefone"] = novo_telefone
+                            print("✅ Telefone atualizado!")
+                            break
+                        else:
+                            print("❌ Telefone inválido. Deve conter 11 dígitos (ex: 11987654321).")
+
+                elif opcao == "4":
+                    while True:
+                        novo_email = input("Novo e-mail: ").strip()
+                        if validar_email(novo_email):
+                            contato["email"] = novo_email
+                            print("✅ E-mail atualizado!")
+                            break
+                        else:
+                            print("❌ E-mail inválido. Digite um e-mail válido.")
+
+                else:
+                    print("Opção inválida. Digite um número de 0 a 4.")
+                
+                pausar()
+        else:
+            print("Opção inválida. Digite um número válido.")
+
 # -----------------------------
 # Funções principais
 # -----------------------------
@@ -282,8 +374,8 @@ def menu_principal():
             deletar_contato()
             break
         elif opcao == "4":
-            print("\nEditando contatos...\n")
-            time.sleep(1)
+            editar_contato()
+            break
         elif opcao == "5":
             print("\nAtualizações feitas... fechando o programa...\n")
             time.sleep(1)

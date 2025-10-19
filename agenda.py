@@ -3,7 +3,7 @@ import time
 import re
 import json
 
-ARQUIVO_CONTATOS = "contatos.json"  # <-- Corrigido nome da variável (antes estava "ARQUIVOS_CONTATOS")
+ARQUIVO_CONTATOS = "contatos.json"  
 
 # -----------------------------
 # Funções utilitárias

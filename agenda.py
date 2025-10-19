@@ -1,6 +1,9 @@
 import os
 import time
 import re
+import json
+
+ARQUIVO_CONTATOS = "contatos.json"  # <-- Corrigido nome da variável (antes estava "ARQUIVOS_CONTATOS")
 
 # -----------------------------
 # Funções utilitárias
@@ -12,6 +15,22 @@ def pausar():
     input("\nPressione ENTER para continuar...")
 
 # -----------------------------
+# Funções de persistência
+# -----------------------------
+def salvar_contatos(contatos):
+    with open(ARQUIVO_CONTATOS, "w", encoding="utf-8") as f:
+        json.dump(contatos, f, indent=4, ensure_ascii=False)
+
+def carregar_contatos():
+    if os.path.exists(ARQUIVO_CONTATOS):
+        with open(ARQUIVO_CONTATOS, "r", encoding="utf-8") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []
+    return []
+
+# -----------------------------
 # Função de validação de campos
 # -----------------------------
 def validar_nome(nome):
@@ -20,11 +39,8 @@ def validar_nome(nome):
 def formatar_data_nascimento():
     while True:
         data = input("Data de nascimento (DD/MM/AAAA): ").strip()
-
-        # Remove tudo que não for número
         numeros = re.sub(r'\D', '', data)
 
-        # Monta a data automaticamente conforme digita
         if len(numeros) >= 2:
             data_formatada = numeros[:2]
             if len(numeros) >= 4:
@@ -36,10 +52,8 @@ def formatar_data_nascimento():
         else:
             data_formatada = numeros
 
-        # Exibe a formatação automática
         print(f"Formato atual: {data_formatada}")
 
-        # Validação final
         if re.fullmatch(r'\d{2}/\d{2}/\d{4}', data_formatada):
             dia, mes, ano = map(int, data_formatada.split('/'))
             if 1 <= dia <= 31 and 1 <= mes <= 12 and 1900 <= ano <= 2100:
@@ -89,6 +103,17 @@ def inserir_contato():
         else:
             print("❌ E-mail inválido. Digite um e-mail válido (ex: nome@email.com)\n")
 
+    contatos = carregar_contatos()
+    novo_contato = {
+        "nome": nome,
+        "nascimento": data_nascimento,
+        "telefone": telefone,
+        "email": email
+    }
+
+    contatos.append(novo_contato)
+    salvar_contatos(contatos)
+
     print("\n✅ Contato inserido com sucesso!")
     print(f"Nome: {nome}")
     print(f"Nascimento: {data_nascimento}")
@@ -97,6 +122,49 @@ def inserir_contato():
 
     pausar()
     menu_principal()
+
+# -----------------------------
+# Função: listar contatos
+# -----------------------------
+def listar_contatos():
+    limpar_tela()
+    contatos = carregar_contatos()
+
+    if not contatos:
+        print("Nenhum contato cadastrado.")
+        pausar()
+        menu_principal()
+        return  # <-- importante: retorna pra não continuar executando abaixo
+
+    print("=================================")
+    print("          LISTAR CONTATOS        ")
+    print("=================================\n")
+
+    for i, contato in enumerate(contatos, start=1):
+        print(f"[{i}] {contato['nome']}")
+    
+    print("\nDigite o número do contato para ver detalhes ou 0 para voltar")
+
+    while True:
+        escolha = input("\nEscolha: ").strip()
+
+        if escolha == "0":
+            menu_principal()
+            return
+        
+        if escolha.isdigit() and 1 <= int(escolha) <= len(contatos):
+            c = contatos[int(escolha) - 1]
+            limpar_tela()
+            print(f"=== DETALHES DO CONTATO [{escolha}] ===")
+            print(f"Nome: {c['nome']}")
+            print(f"Nascimento: {c['nascimento']}")
+            print(f"Telefone: {c['telefone']}")
+            print(f"E-mail: {c['email']}")
+            pausar()
+            listar_contatos()
+            return
+        else:
+            print("Opção inválida. Digite um número válido.")
 
 # -----------------------------
 # Funções principais
@@ -151,8 +219,8 @@ def menu_principal():
             inserir_contato()
             break
         elif opcao == "2":
-            print("\nListando contatos...\n")
-            time.sleep(1)
+            listar_contatos()  # ✅ Corrigido: agora chama a função corretamente
+            break
         elif opcao == "3":
             print("\nDeletando contatos...\n")
             time.sleep(1)
